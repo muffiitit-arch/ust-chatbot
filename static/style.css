@@ -380,13 +380,15 @@ body {
 
 @media (max-width: 900px) {
     html, body {
-        height: 100%;
-        overflow: hidden;
+        height: auto;
+        min-height: 100%;
+        overflow: visible;
         overscroll-behavior-y: auto;
     }
     body {
         display: block;
-        height: 100vh;
+        min-height: 100vh;
+        height: auto;
     }
     .hero-section {
         display: none;
@@ -416,6 +418,7 @@ body {
         min-height: 0;
         padding: 15px;
         overflow-y: auto;
+        overscroll-behavior-y: contain;
     }
     .suggestions {
         flex-shrink: 0;
