@@ -84,3 +84,9 @@ suggestionBtns.forEach(function (btn) {
         sendQuestion();
     });
 });
+const backBtn = document.getElementById("backBtn");
+if (backBtn) {
+    backBtn.addEventListener("click", function () {
+        window.location.href = "/";
+    });
+}
