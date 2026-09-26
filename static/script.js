@@ -7,7 +7,7 @@ const suggestionBtns = document.querySelectorAll(".suggestion-btn");
 const welcomeMessage = `
     <div class="message bot-message">
         <div class="bubble">
-            <p>السلام عليكم ورحمة الله.<br>أنا مساعد التسجيل الإداري. اكتب استفسارك وسأحاول مساعدتك.</p>
+            <p>السلام عليكم ورحمة الله.<br>أنا مساعد التسجيل . اكتب استفسارك وسأحاول مساعدتك.</p>
         </div>
     </div>
 `;
@@ -84,9 +84,3 @@ suggestionBtns.forEach(function (btn) {
         sendQuestion();
     });
 });
-const backBtn = document.getElementById("backBtn");
-if (backBtn) {
-    backBtn.addEventListener("click", function () {
-        window.location.href = "/";
-    });
-}

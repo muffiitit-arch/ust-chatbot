@@ -25,7 +25,6 @@ body {
     background: var(--white);
 }
 
-/* ============ القسم الأيمن ============ */
 .hero-section {
     flex: 1.1;
     position: relative;
@@ -134,7 +133,6 @@ body {
     background: var(--red);
 }
 
-/* ============ قسم الشات ============ */
 .chat-section {
     flex: 1;
     background: var(--bg-gray);
@@ -374,7 +372,6 @@ body {
     color: var(--text-gray);
 }
 
-/* ============ الموبايل ============ */
 @media (max-width: 900px) {
     html, body {
         height: 100%;
@@ -428,7 +425,6 @@ body {
         display: none;
     }
 }
-/* زر الرجوع */
 .back-btn {
     background: transparent;
     border: none;
