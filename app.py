@@ -6,7 +6,6 @@ import os
 
 app = Flask(__name__)
 
-# قراءة قاعدة المعرفة
 try:
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     df = pd.read_excel(os.path.join(BASE_DIR, "knowledge_base.xlsx"), header=1)

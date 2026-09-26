@@ -4,19 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>مساعد التسجيل  | كلية الحاسوب</title>
+    <title>مساعد تسجيل | كلية الحاسوب</title>
+    <script>
+        window.addEventListener("load", function() {
+            const navType = performance.getEntriesByType("navigation")[0].type;
+            if (navType === "reload") {
+                window.location.href = "/";
+            }
+        });
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-     <script>
-    window.addEventListener("load", function() {
-        const navType = performance.getEntriesByType("navigation")[0].type;
-        if (navType === "reload") {
-            window.location.href = "/";
-        }
-    });
-</script>
 </head>
 
 <body>
@@ -34,8 +34,8 @@
 
             <div class="hero-main">
                 <div class="hero-line"></div>
-                <h2>التسجيل </h2>
-                <p>نظام استفسارات خاص بطلاب كلية الحاسوب. اسأل عن أي إجراء يخص التسجيل، وستحصل على الإجابة الموثقة.</p>
+                <h2>مساعد تسجيل</h2>
+                <p>نظام استفسارات يجيب على أسئلتك حول التسجيل الإداري</p>
             </div>
 
             <div class="hero-footer">
@@ -47,18 +47,12 @@
     <div class="chat-section">
         <div class="chat-container">
             <div class="chat-header">
-                <button id="backBtn" title="رجوع" class="back-btn">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-        <line x1="19" y1="12" x2="5" y2="12"></line>
-        <polyline points="12 19 5 12 12 5"></polyline>
-    </svg>
-</button>
                 <div class="chat-header-info">
                     <div class="bot-avatar">
                         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
                     </div>
                     <div class="chat-header-text">
-                        <h3>مساعد التسجيل </h3>
+                        <h3>مساعد تسجيل</h3>
                         <span>كلية الحاسوب</span>
                     </div>
                 </div>
@@ -73,7 +67,7 @@
             <div class="chat-box" id="chatBox">
                 <div class="message bot-message">
                     <div class="bubble">
-                        <p>السلام عليكم ورحمة الله<br>أنا مساعد التسجيل  اكتب استفسارك وسأحاول مساعدتك</p>
+                        <p>السلام عليكم ورحمة الله<br>أنا مساعد تسجيل، اكتب استفسارك وسأحاول مساعدتك</p>
                     </div>
                 </div>
             </div>
@@ -81,11 +75,11 @@
             <div class="suggestions">
                 <button class="suggestion-btn">كيف أسجل؟</button>
                 <button class="suggestion-btn">المستندات المطلوبة</button>
-                <button class="suggestion-btn"> استرجاع كلمه المرور </button>
+                <button class="suggestion-btn">استرجاع كلمة المرور</button>
             </div>
 
             <div class="input-area">
-                <input type="text" id="userInput" placeholder="اكتب استفسارك هنا...">
+                <input type="text" id="userInput" placeholder="اكتب استفسارك هنا">
                 <button id="sendBtn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
                         <line x1="22" y1="2" x2="11" y2="13"></line>

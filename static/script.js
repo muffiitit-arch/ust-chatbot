@@ -7,7 +7,7 @@ const suggestionBtns = document.querySelectorAll(".suggestion-btn");
 const welcomeMessage = `
     <div class="message bot-message">
         <div class="bubble">
-            <p>السلام عليكم ورحمة الله.<br>أنا مساعد التسجيل . اكتب استفسارك وسأحاول مساعدتك.</p>
+            <p>السلام عليكم ورحمة الله<br>أنا مساعد تسجيل، اكتب استفسارك وسأحاول مساعدتك</p>
         </div>
     </div>
 `;
@@ -62,7 +62,7 @@ function sendQuestion() {
     .catch(error => {
         setTimeout(() => {
             removeTyping();
-            addMessage("حدث خطأ أثناء الاتصال بالمساعد.", "bot");
+            addMessage("حدث خطأ أثناء الاتصال بالمساعد", "bot");
         }, 700);
         console.error(error);
     });
