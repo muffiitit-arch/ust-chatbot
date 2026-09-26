@@ -2,12 +2,15 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for
 import pandas as pd
 from rapidfuzz import process, fuzz
 import re
+import os
 
 app = Flask(__name__)
 
 # قراءة قاعدة المعرفة
 try:
-    df = pd.read_excel("knowledge_base.xlsx", header=1)
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    df = pd.read_excel(os.path.join(BASE_DIR, "knowledge_base.xlsx"), header=1)
+    print(f"تم تحميل قاعدة المعرفة: {len(df)} سؤال")
 except Exception as e:
     print(f"خطأ في تحميل قاعدة المعرفة: {e}")
     df = pd.DataFrame(columns=["السؤال", "الجواب"])
