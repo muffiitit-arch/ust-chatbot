@@ -71,21 +71,14 @@ def get_answer(user_question):
     if len(user_q.split()) <= 1:
         return "ممكن توضح سؤالك أكتر؟"
 
-    matches = process.extract(user_q, df["_normalized"].tolist(), scorer=fuzz.token_set_ratio, limit=3)
+    match = process.extractOne(user_q, df["_normalized"].tolist(), scorer=fuzz.token_set_ratio)
 
-    if matches and matches[0][1] >= 55:
-        top_score = matches[0][1]
-        close_ones = [m for m in matches if top_score - m[1] < 5]
-        answers = set()
-        for m in close_ones:
-            answer = df.iloc[m[2]]["الجواب"]
-            answers.add(answer)
-        if len(answers) > 1:
-            return "ممكن توضح أكتر؟ حدد البلد أو الفئة (سوداني داخل السودان، سوداني في مصر/السعودية، أو أجنبي)"
-        return df.iloc[matches[0][2]]["الجواب"]
+    if match:
+        matched_question, score, index = match
+        if score >= 55:
+            return df.iloc[index]["الجواب"]
 
-    return "السؤال ده مش موجود في قاعدة المعرفة"
-
+    return "عذرًا، لم أتمكن من العثور على إجابة دقيقة لسؤالك"
 @app.route("/")
 def login_page():
     return render_template("login.html")
