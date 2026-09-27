@@ -40,7 +40,7 @@ def normalize_arabic(text):
     }
     
     for word, replacement in synonyms.items():
-        text = text.replace(word, replacement)
+        text = re.sub(r'\b' + re.escape(word) + r'\b', replacement, text)
     
     text = re.sub(r'[إأآا]', 'ا', text)
     text = re.sub(r'ى', 'ي', text)
