@@ -54,7 +54,7 @@ def get_answer(user_question):
     match = process.extractOne(user_q, questions, scorer=fuzz.token_set_ratio)
     if match:
         matched_question, score, index = match
-        if score >= 55:
+        if score >= 65:
             return df.iloc[index]["الجواب"]
     return "لم أتمكن من العثور على إجابة دقيقة لسؤالك. يرجى إعادة صياغة السؤال "
 
