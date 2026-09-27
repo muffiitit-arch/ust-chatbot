@@ -63,7 +63,7 @@ def get_answer(user_question):
         if score >= 65:
             return df.iloc[index]["الجواب"]
 
-    return "\ ممكن توضح سؤالك أكتر؟"
+    return " ممكن توضح سؤالك أكتر؟"
 
 @app.route("/")
 def login_page():
