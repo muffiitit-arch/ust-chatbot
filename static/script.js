@@ -12,6 +12,16 @@ const welcomeMessage = `
     </div>
 `;
 
+function linkify(text) {
+    return text.replace(
+        /(https?:\/\/[^\s<]+)|((?:reg|support|ustgate)\.[a-z0-9.-]+\.[a-z]{2,}(?:\/[^\s<]*)?)/g,
+        function(match, fullUrl, bareDomain) {
+            const url = fullUrl ? fullUrl : "https://" + bareDomain;
+            return '<a href="' + url + '" target="_blank" rel="noopener" class="chat-link">' + match + "</a>";
+        }
+    );
+}
+
 function showTyping() {
     const wrapper = document.createElement("div");
     wrapper.classList.add("message", "bot-message");
@@ -33,7 +43,8 @@ function removeTyping() {
 function addMessage(text, sender) {
     const wrapper = document.createElement("div");
     wrapper.classList.add("message", sender === "user" ? "user-message" : "bot-message");
-    wrapper.innerHTML = `<div class="bubble"><p>${text}</p></div>`;
+    const content = sender === "bot" ? linkify(text) : text;
+    wrapper.innerHTML = `<div class="bubble"><p>${content}</p></div>`;
     chatBox.appendChild(wrapper);
     chatBox.scrollTop = chatBox.scrollHeight;
 }

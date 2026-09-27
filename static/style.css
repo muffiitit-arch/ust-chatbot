@@ -435,3 +435,21 @@ body {
         display: none;
     }
 }
+.chat-link {
+    color: #c1272d;
+    text-decoration: underline;
+    word-break: break-all;
+    font-weight: 600;
+}
+
+.chat-link:hover {
+    color: #1f2a5c;
+}
+
+.bot-message .bubble .chat-link {
+    color: #c1272d;
+}
+
+.bot-message .bubble .chat-link:hover {
+    color: #1f2a5c;
+}
