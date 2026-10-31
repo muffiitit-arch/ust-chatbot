@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>مساعد تسجيل | جامعة العلوم والتقانة</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+</head>
+<body>
+
+    <div class="bg-image"></div>
+    <div class="bg-overlay"></div>
+
+    <div class="landing-wrapper">
+        <div class="landing-card">
+            <div class="card-logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+            </div>
+
+            <h1 class="card-title">جامعة العلوم والتقانة</h1>
+            <span class="card-subtitle-en">University of Science & Technology</span>
+
+            <div class="card-divider"></div>
+
+            <h2 class="card-heading">مساعد تسجيل</h2>
+            <p class="card-dept">كلية الحاسوب</p>
+
+            <p class="card-description">
+                مرحبًا بك في مساعد تسجيل جامعة العلوم والتقانة
+            </p>
+
+            <div class="slide-btn" id="slideBtn">
+                <div class="slide-bg-text">اسحب لبدء المحادثة</div>
+                <div class="slide-fill" id="slideFill"></div>
+                <div class="slide-handle" id="slideHandle">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="landing-footer">
+            <span>كلية الحاسوب</span>
+        </div>
+    </div>
+
+    <script>
+        const slideBtn = document.getElementById("slideBtn");
+        const slideHandle = document.getElementById("slideHandle");
+        const slideFill = document.getElementById("slideFill");
+
+        let isDragging = false;
+        let startX = 0;
+        let maxDrag = 0;
+        let triggered = false;
+
+        function getClientX(e) {
+            return e.touches ? e.touches[0].clientX : e.clientX;
+        }
+
+        function startDrag(e) {
+            if (triggered) return;
+            isDragging = true;
+            startX = getClientX(e);
+            maxDrag = slideBtn.offsetWidth - slideHandle.offsetWidth - 8;
+            slideHandle.style.transition = "none";
+            slideFill.style.transition = "none";
+        }
+
+        function moveDrag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+
+            const currentX = getClientX(e);
+            let diff = startX - currentX;
+
+            if (diff < 0) diff = 0;
+            if (diff > maxDrag) diff = maxDrag;
+
+            slideHandle.style.transform = "translateX(" + (-diff) + "px)";
+            slideFill.style.width = (diff + slideHandle.offsetWidth) + "px";
+
+            if (diff >= maxDrag * 0.92) {
+                triggered = true;
+                isDragging = false;
+                slideHandle.style.transform = "translateX(" + (-maxDrag) + "px)";
+                slideFill.style.width = "100%";
+                window.location.href = "/chat";
+            }
+        }
+
+        function endDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+
+            if (!triggered) {
+                slideHandle.style.transition = "transform 0.3s ease";
+                slideFill.style.transition = "width 0.3s ease";
+                slideHandle.style.transform = "translateX(0)";
+                slideFill.style.width = "0";
+            }
+        }
+
+        slideHandle.addEventListener("mousedown", startDrag);
+        document.addEventListener("mousemove", moveDrag);
+        document.addEventListener("mouseup", endDrag);
+
+        slideHandle.addEventListener("touchstart", startDrag, { passive: true });
+        document.addEventListener("touchmove", moveDrag, { passive: false });
+        document.addEventListener("touchend", endDrag);
+
+        window.addEventListener("pageshow", function(event) {
+            if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+                slideHandle.style.transform = "translateX(0)";
+                slideFill.style.width = "0";
+                triggered = false;
+                isDragging = false;
+                slideHandle.style.transition = "none";
+                slideFill.style.transition = "none";
+            }
+        });
+    </script>
+
+</body>
+</html>
