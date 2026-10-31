@@ -54,7 +54,7 @@ def get_answer(user_question):
     try:
         # استخدام الموديل الجديد من جوجل
         response = client.models.generate_content(
-            model='gemini-2.0-flash',
+            model='gemini-3.8-flash',
             contents=prompt
         )
         answer = response.text.strip()
