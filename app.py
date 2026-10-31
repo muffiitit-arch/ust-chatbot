@@ -51,13 +51,28 @@ def get_answer(user_question):
     الجواب:
     """
 
-    try:
-        # استخدام الموديل الجديد من جوجل
-        response = client.models.generate_content(
-            model='gemini-3.8-flash',
-            contents=prompt
-        )
-        answer = response.text.strip()
+        try:
+        import time
+        response = None
+        # هنحاول 3 مرات لو جوجل زحمت
+        for attempt in range(3):
+            try:
+                # استخدام الموديل الجديد من جوجل
+                response = client.models.generate_content(
+                    model='gemini-3.8-flash',
+                    contents=prompt
+                )
+                break # لو نجح، اخرج من اللوب
+            except Exception as e:
+                if "503" in str(e) or "UNAVAILABLE" in str(e):
+                    time.sleep(2) # استنى ثانيتين وجرب تاني
+                else:
+                    raise e # لو الخطأ مش زحمة، اطلع بره
+        
+        if response:
+            answer = response.text.strip()
+        else:
+            return "السيرفر مشغول حالياً، جرب تاني بعد شوية."
         
         if "مش موجود" in answer or "لم أجد" in answer:
             return "السؤال ده مش موجود في قاعدة المعرفة"
