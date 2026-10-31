@@ -1,24 +1,33 @@
 from flask import Flask, render_template, request, jsonify
 import pandas as pd
 import os
-import google.generativeai as genai
+from google import genai
 from dotenv import load_dotenv
+
 load_dotenv()
 app = Flask(__name__)
 
-GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY") 
-genai.configure(api_key=GOOGLE_API_KEY)
+# ==========================================
+# 1. إعدادات الذكاء الاصطناعي (Gemini)
+# ==========================================
+GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
+client = genai.Client(api_key=GOOGLE_API_KEY)
 
-model = genai.GenerativeModel('gemini-1.5-flash')
+# ==========================================
+# 2. قراءة قاعدة المعرفة
+# ==========================================
 try:
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     df = pd.read_excel(os.path.join(BASE_DIR, "knowledge_base.xlsx"), header=1)
-    df = df.dropna() # حذف أي صفوف فاضية
+    df = df.dropna()
     print(f"تم تحميل قاعدة المعرفة: {len(df)} سؤال")
 except Exception as e:
     print(f"خطأ في تحميل قاعدة المعرفة: {e}")
     df = pd.DataFrame(columns=["السؤال", "الجواب"])
 
+# ==========================================
+# 3. دالة الحصول على الجواب
+# ==========================================
 def get_answer(user_question):
     knowledge_text = ""
     for index, row in df.iterrows():
@@ -43,10 +52,12 @@ def get_answer(user_question):
     """
 
     try:
-        
-        response = model.generate_content(prompt)
+        # استخدام الموديل الجديد من جوجل
+        response = client.models.generate_content(
+            model='gemini-2.0-flash',
+            contents=prompt
+        )
         answer = response.text.strip()
-        
         
         if "مش موجود" in answer or "لم أجد" in answer:
             return "السؤال ده مش موجود في قاعدة المعرفة"
@@ -56,6 +67,9 @@ def get_answer(user_question):
         print(f"Error: {e}")
         return "حدث خطأ في الاتصال بالذكاء الاصطناعي."
 
+# ==========================================
+# 4. مسارات الموقع
+# ==========================================
 @app.route("/")
 def login_page():
     return render_template("login.html")
