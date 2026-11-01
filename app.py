@@ -9,9 +9,9 @@ app = Flask(__name__)
 try:
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     df = pd.read_excel(os.path.join(BASE_DIR, "knowledge_base.xlsx"), header=1)
-    print(f"  خطاء في الاتصال بي المساعد  : {len(df)} سؤال")
+    print(f"تم تحميل قاعدة المعرفة: {len(df)} سؤال")
 except Exception as e:
-    print(f"  خطاء في الاتصال بي المساعد   : {e}")
+    print(f"خطأ في تحميل قاعدة المعرفة: {e}")
     df = pd.DataFrame(columns=["السؤال", "الجواب"])
 
 def normalize_arabic(text):
@@ -49,14 +49,18 @@ def normalize_arabic(text):
 def get_answer(user_question):
     questions = df["السؤال"].apply(normalize_arabic).tolist()
     user_q = normalize_arabic(user_question)
+    
     if len(user_q.split()) <= 1:
-        return "يرجى كتابة سؤال أكثر تفصيلاً للحصول على إجابة دقيقة"
+        return "السؤال ده مش موجود في قاعدة المعرفة. يُرجى التواصل مع شؤون التسجيل."
+        
     match = process.extractOne(user_q, questions, scorer=fuzz.token_set_ratio)
+    
     if match:
         matched_question, score, index = match
-        if score >= 65:
+        if score >= 60:
             return df.iloc[index]["الجواب"]
-    return "لم أتمكن من العثور على إجابة دقيقة لسؤالك. يرجى إعادة صياغة السؤال "
+            
+    return "السؤال ده مش موجود في قاعدة المعرفة. يُرجى التواصل مع شؤون التسجيل."
 
 @app.route("/")
 def login_page():
