@@ -1,90 +1,50 @@
 from flask import Flask, render_template, request, jsonify
-import pandas as pd
+import pickle
 import os
-from google import genai
-from dotenv import load_dotenv
+import re
+from sklearn.metrics.pairwise import cosine_similarity
 
-load_dotenv()
 app = Flask(__name__)
 
-# ==========================================
-# 1. إعدادات الذكاء الاصطناعي (Gemini)
-# ==========================================
-GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
-client = genai.Client(api_key=GOOGLE_API_KEY)
-
-# ==========================================
-# 2. قراءة قاعدة المعرفة
-# ==========================================
+# 1. تحميل العقل الجاهز (الملف اللي عملناه)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 try:
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    df = pd.read_excel(os.path.join(BASE_DIR, "knowledge_base.xlsx"), header=1)
-    df = df.dropna()
-    print(f"تم تحميل قاعدة المعرفة: {len(df)} سؤال")
+    with open(os.path.join(BASE_DIR, 'vectors.pkl'), 'rb') as f:
+        vectorizer, vectors, questions, answers = pickle.load(f)
+    print(f"تم تحميل {len(questions)} سؤال بنجاح!")
 except Exception as e:
-    print(f"خطأ في تحميل قاعدة المعرفة: {e}")
-    df = pd.DataFrame(columns=["السؤال", "الجواب"])
+    print(f"خطأ في التحميل: {e}")
 
-# ==========================================
-# 3. دالة الحصول على الجواب
-# ==========================================
+# دالة التنظيف (لازم تكون نفس اللي في السكريبت الأول)
+def clean(text):
+    text = str(text)
+    text = re.sub(r'[إأآا]', 'ا', text)
+    text = re.sub(r'ى', 'ي', text)
+    text = re.sub(r'ة', 'ه', text)
+    text = re.sub(r'[^\w\s]', '', text)
+    return text.strip()
+
 def get_answer(user_question):
-    knowledge_text = ""
-    for index, row in df.iterrows():
-        knowledge_text += f"سؤال: {row['السؤال']} | الجواب: {row['الجواب']}\n"
+    if not questions:
+        return "حدث خطأ في قاعدة المعرفة."
 
-    prompt = f"""
-    أنت مساعد ذكي خاص بكلية علوم الحاسوب وتقانة المعلومات في جامعة العلوم والتقانة.
-    مهمتك: الإجابة على سؤال الطالب بدقة شديدة بالاعتماد *فقط* على قاعدة المعرفة المرفقة.
-    
-    القواعد:
-    1. افهم معنى سؤال الطالب مهما كانت اللهجة (سودانية، فصحى، عامية).
-    2. ابحث في قاعدة المعرفة عن السؤال الأقرب في *المعنى* وليس الكلمات.
-    3. إذا وجدت الإجابة، اكتب الجواب فقط بدون أي مقدمات أو إضافات.
-    4. إذا لم تجد الإجابة، اكتب فقط الجملة التالية: "السؤال ده مش موجود في قاعدة المعرفة".
-    
-    قاعدة المعرفة:
-    {knowledge_text}
-    
-    سؤال الطالب: {user_question}
-    
-    الجواب:
-    """
+    # تنظيف سؤال الطالب وتحويله لأرقام
+    user_q_clean = clean(user_question)
+    user_vector = vectorizer.transform([user_q_clean])
 
-        try:
-        import time
-        response = None
-        # هنحاول 3 مرات لو جوجل زحمت
-        for attempt in range(3):
-            try:
-                # استخدام الموديل الجديد من جوجل
-                response = client.models.generate_content(
-                    model='gemini-3.8-flash',
-                    contents=prompt
-                )
-                break # لو نجح، اخرج من اللوب
-            except Exception as e:
-                if "503" in str(e) or "UNAVAILABLE" in str(e):
-                    time.sleep(2) # استنى ثانيتين وجرب تاني
-                else:
-                    raise e # لو الخطأ مش زحمة، اطلع بره
-        
-        if response:
-            answer = response.text.strip()
-        else:
-            return "السيرفر مشغول حالياً، جرب تاني بعد شوية."
-        
-        if "مش موجود" in answer or "لم أجد" in answer:
-            return "السؤال ده مش موجود في قاعدة المعرفة"
-        
-        return answer
-    except Exception as e:
-        print(f"Error: {e}")
-        return "حدث خطأ في الاتصال بالذكاء الاصطناعي."
+    # حساب التشابه الدلالي
+    similarities = cosine_similarity(user_vector, vectors)[0]
+    
+    # جلب أعلى نسبة
+    best_idx = similarities.argmax()
+    best_score = similarities[best_idx]
 
-# ==========================================
-# 4. مسارات الموقع
-# ==========================================
+    # العتبة 60% (لو قريبة جداً رد، لو بعيدة اعتذر)
+    if best_score >= 0.60:
+        return answers[best_idx]
+    else:
+        return "السؤال ده مش موجود في قاعدة المعرفة. يُرجى التواصل مع شؤون التسجيل."
+
 @app.route("/")
 def login_page():
     return render_template("login.html")
