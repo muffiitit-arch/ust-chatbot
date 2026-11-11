@@ -14,10 +14,12 @@ except Exception as e:
     print(f"خطأ في تحميل قاعدة المعرفة: {e}")
     df = pd.DataFrame(columns=["السؤال", "الجواب"])
 
+STOP_WORDS = {"ما", "ماذا", "هي", "هو", "كيف", "كم", "هل", "اين", "متى", "من", "في", "على", "الى", "عن", "يعني", "اريد", "معلومات"}
+
 def normalize_arabic(text):
     text = str(text)
     synonyms = {
-        "ازاي": "كيف", "إزاي": "كيف", "ايه": "ما", "عايز": "اريد",
+        "ازاي":  "كيف", "إزاي": "كيف", "ايه": "ما", "عايز" "داير": "اريد",
         "عاوز": "اريد", "باسورد": "كلمة المرور", "رقم القيد": "الرقم الجامعي",
         "الجامعه": "الجامعة", "رسومات": "رسوم",
         "كيفن": "كيف", "كيفو": "كيف", "كيفك": "كيف",
@@ -35,10 +37,16 @@ def normalize_arabic(text):
         "دي": "هذه", "ده": "هذا", "دا": "هذا", "ديل": "هؤلاء",
         "ليه": "لماذا", "ليش": "لماذا",
         "مافي": "لا يوجد", "ما في": "لا يوجد",
-        "ماموجود": "لا يوجد", "موجود": "هل هناك"
+        "ماموجود": "لا يوجد", "موجود": "هل هناك",
+        # الخطوة 1: المرادفات الجديدة
+        "الاوراق": "المستندات", "امتحان": "اختبار",
+        "نسيت كلمة المرور": "كيف استعيد كلمة المرور",
+        "كلمة السر": "كلمة المرور", "التانية": "الثانية",
+        "الاقسام": "اقسام", "مواد": "مواد", "قبول": "قبول"
     }
     for word, replacement in synonyms.items():
         text = text.replace(word, replacement)
+    
     text = re.sub(r'[إأآا]', 'ا', text)
     text = re.sub(r'ى', 'ي', text)
     text = re.sub(r'ة', 'ه', text)
@@ -50,17 +58,22 @@ def get_answer(user_question):
     questions = df["السؤال"].apply(normalize_arabic).tolist()
     user_q = normalize_arabic(user_question)
     
-    if len(user_q.split()) <= 1:
-        return "السؤال ده مش موجود في قاعدة المعرفة. يُرجى التواصل مع شؤون التسجيل."
+    if user_q in questions:
+        return df.iloc[questions.index(user_q)]["الجواب"]
         
+    useful_words = [w for w in user_q.split() if w not in STOP_WORDS]
+    if not useful_words:
+        return "لم أتمكن من العثور على إجابة دقيقة لسؤالك  يرجى إعادة صياغة السؤال "
+        
+
     match = process.extractOne(user_q, questions, scorer=fuzz.token_set_ratio)
     
     if match:
         matched_question, score, index = match
-        if score >= 60:
+        if score >= 70:  
             return df.iloc[index]["الجواب"]
             
-    return "السؤال ده مش موجود في قاعدة المعرفة. يُرجى التواصل مع شؤون التسجيل."
+    return "السؤال ده غير موجود في قاعدة المعرفة يرجى التواصل مع شؤون التسجيل"
 
 @app.route("/")
 def login_page():
